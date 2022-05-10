@@ -15,6 +15,7 @@
   "dependencies": {
     "@koa/cors": "^3.1.0",
     "bcrypt": "^5.0.1",
+    "dayjs": "^1.11.2",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.13.4",
     "koa-body": "^4.2.0",

@@ -5,7 +5,7 @@ const baseWebpackConfig = require('./webpack.config.base');
 const webpackConfig = merge(baseWebpackConfig, {
   devtool: 'eval-source-map', // 调试模式
   mode: 'development',
-  stats: { children: false }
+  status: { children: false }
 })
 
 module.exports = webpackConfig

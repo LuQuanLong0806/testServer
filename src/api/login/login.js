@@ -2,7 +2,7 @@
 const jsonwebtoken = require('jsonwebtoken')
 const config = require('../../config/index')
 const bcrypt = require('bcrypt');
-const moment = require('moment');
+const dayjs = require('dayjs');
 const { checkCapchat } = require('../../common/util')
 
 const User = require('../../model/user');
@@ -94,7 +94,7 @@ class LoginController {
                     name: body.name,
                     nickname: body.nickname,
                     password: body.password,
-                    created: moment().format('YYYY-MM-DD HH:mm:ss')
+                    created: dayjs().format('YYYY-MM-DD HH:mm:ss')
                 })
                 let result = await user.save()
                 ctx.body = {
