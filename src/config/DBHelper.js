@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 const { DB_URL } = require('./index');
 
-mongoose.set('useCreateIndex', true);
+// mongoose.set('useCreateIndex', true);
 
 // 创建连接 
 mongoose.connect(DB_URL, {

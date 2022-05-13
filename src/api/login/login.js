@@ -40,10 +40,19 @@ class LoginController {
                             expiresIn: '1d' // 1天后过期
                         }
                     );
+                    // 去掉用户的敏感信息
+                    let userInfo = JSON.parse(JSON.stringify(user))
+                    let Arr = ['password', 'name'];
+                    Arr.forEach(d => {
+                        delete userInfo[d];
+                        console.log('d', d, userInfo);
+                    })
+                    // console.log(user);
                     ctx.body = {
                         code: 200,
                         data: {
-                            token: token
+                            token: token,
+                            userInfo: userInfo
                         },
                         message: 'success!'
                     }
