@@ -7,6 +7,8 @@ const { checkCapchat } = require('../../common/util')
 
 const User = require('../../model/user');
 
+const SignRecord = require('./../../model/SignRecord');
+
 class LoginController {
     constructor() { }
     async login(ctx) {
@@ -30,11 +32,11 @@ class LoginController {
                     // 设置过期时间
                     // 方法1 通过参数传递 exp: 秒数
                     // let time = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
-                    // let token = jsonwebtoken.sign({ _id: 'brain', exp: time },
+                    // let token = jsonwebtoken.sign({ _id:  user._id , exp: time },
                     //     config.JWT_SECRET
                     // );
                     // 方法2
-                    let token = jsonwebtoken.sign({ _id: 'brain' },
+                    let token = jsonwebtoken.sign({ _id: user._id },
                         config.JWT_SECRET,
                         {
                             expiresIn: '1d' // 1天后过期
@@ -45,8 +47,13 @@ class LoginController {
                     let Arr = ['password', 'name'];
                     Arr.forEach(d => {
                         delete userInfo[d];
-                        console.log('d', d, userInfo);
                     })
+
+                    let isSign = SignRecord.findByUid(userInfo._id)
+                    if (isSign && dayjs(isSign.created).format('YYYY-MM-DD') === dayjs().format('YYYY-MM-DD')) {
+                        userInfo.isSign = true;
+                    }
+
                     // console.log(user);
                     ctx.body = {
                         code: 200,
