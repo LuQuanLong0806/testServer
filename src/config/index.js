@@ -9,8 +9,11 @@ const Redis = {
 // JWT_SECRET
 const JWT_SECRET = 'aWS!23&*HJSH$!&*ASF!%^5523*SAFL^5AF2z56sf5wAF*@5#%!%SF55q85'
 
+const baseUrl = 'http://localhost:9090'
+
 module.exports = {
   DB_URL: DB_URL,
   Redis: Redis,
-  JWT_SECRET
+  JWT_SECRET,
+  baseUrl
 }

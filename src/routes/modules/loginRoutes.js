@@ -2,7 +2,7 @@
 const Router = require('koa-router')
 const router = new Router()
 
-const LoginController = require('../../api/login/login')
+const LoginController = require('./../../api/login/login')
 
 router.prefix('/login')
 

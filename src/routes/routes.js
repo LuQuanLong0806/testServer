@@ -1,12 +1,10 @@
 
 const comBineRouters = require('koa-combine-routers')
 
-const userRoutes = require('./userRoutes')
-const postRoutes = require('./postRoutes')
-const captcha = require('./captchaRoutes')
-const login = require('./login/login')
-
-
+const userRoutes = require('./modules/userRoutes')
+const postRoutes = require('./modules/postRoutes')
+const captcha = require('./modules/captchaRoutes')
+const login = require('./modules/loginRoutes')
 
 module.exports = comBineRouters(
     userRoutes,
@@ -15,6 +13,7 @@ module.exports = comBineRouters(
     login
 )
 
+// const moduleFiles = require().context('./modules', true, /\.js/)
 // export default comBineRouters(
 //     userRoutes,
 //     postRoutes

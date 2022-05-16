@@ -1,14 +1,18 @@
 
 const dayjs = require('dayjs');
+const uuid = require('uuid');
+const jwt = require('jsonwebtoken');
 
 const SignRecord = require('./../model/SignRecord');
-
 const { getJWTPayload } = require('./../common/util');
 
 const User = require('../model/user');
+const send = require('./../config/MailConfig');
+const { setValue } = require('../config/RedisConfig');
 
+const config = require('./../config');
 class UserController {
-
+  // 用户签到接口
   async userSign(ctx) {
     // 用户签到逻辑
     // 1. 取用户的ID
@@ -159,6 +163,60 @@ class UserController {
     }
 
 
+  }
+  // 更新用户基本信息接口
+  async updateUserInfo(ctx) {
+    const { body } = ctx.request
+    const obj = await getJWTPayload(ctx.header.authorization);
+    // 查找用户
+    const user = await User.findOne({ _id: obj._id })
+    // 判断用户是否修改了邮箱
+    if (body.name && body.name !== user.nam) {
+      // 用户修改了邮箱
+      const key = uuid();
+      setValue(key, jwt.sign({ _id: obj._id },
+        config.JWT_SECRET, {
+        expiresIn: '30m'
+      }
+      ))
+      // 发送reset邮件
+      const result = await send({
+        token: '',
+        type: 'email',
+        key: key,
+        code: '',
+        expire: dayjs().add(30, 'minutes').format('YYYY-MM-DD HH:mm:ss'),
+        email: user.name,
+        user: user.nickname
+      })
+      ctx.body = {
+        code: 500,
+        data: result,
+        message: '邮件发送成功!请点击链接重新绑定邮箱!'
+      }
+
+
+    } else {
+      const arr = ['mobile', 'password']
+      arr.map(d => { delete body[d] })
+
+      const result = await User.update(
+        { _id: obj._id },
+        body
+      )
+
+      if (result.n === 1 && result.ok === 1) {
+        ctx.body = {
+          code: 200,
+          message: '更新成功!'
+        }
+      } else {
+        ctx.body = {
+          code: 500,
+          message: '更新失败!'
+        }
+      }
+    }
   }
 }
 

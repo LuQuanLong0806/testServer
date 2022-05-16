@@ -3,9 +3,9 @@ const Router = require('koa-router')
 
 const router = new Router()
 
-const user = require('../api/user');
+const user = require('./../../api/user');
 
-const UserController = require('./../api/UserController')
+const UserController = require('./../../api/UserController')
 
 // 前缀
 router.prefix('/user')
