@@ -49,8 +49,9 @@ class LoginController {
                         delete userInfo[d];
                     })
 
-                    let isSign = SignRecord.findByUid(userInfo._id)
-                    if (isSign && dayjs(isSign.created).format('YYYY-MM-DD') === dayjs().format('YYYY-MM-DD')) {
+                    let isSign = await SignRecord.findByUid(userInfo._id)
+
+                    if (isSign && isSign.created && dayjs(isSign.created).format('YYYY-MM-DD') === dayjs().format('YYYY-MM-DD')) {
                         userInfo.isSign = true;
                     }
 
