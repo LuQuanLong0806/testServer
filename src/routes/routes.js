@@ -5,12 +5,14 @@ const userRoutes = require('./modules/userRoutes')
 const postRoutes = require('./modules/postRoutes')
 const captcha = require('./modules/captchaRoutes')
 const login = require('./modules/loginRoutes')
+const content = require('./modules/contentRoutes')
 
 module.exports = comBineRouters(
     userRoutes,
     postRoutes,
     captcha,
-    login
+    login,
+    content
 )
 
 // const moduleFiles = require().context('./modules', true, /\.js/)

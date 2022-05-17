@@ -36,7 +36,16 @@ const middleware = compose([
     helmet(),
     statics(path.join(__dirname, './public')),
     koaJson(),
-    koaBody(),
+    koaBody({
+        multipart: true,
+        formidable: {
+            keepExtensions: true,
+            maxFieldsSize: 5 * 1024 * 1024
+        },
+        onError: err => {
+            console.log(err);
+        }
+    }),
     jwt,
     errHandle,
 ])

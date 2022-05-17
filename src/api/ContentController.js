@@ -1,27 +1,17 @@
 
 const Post = require('./../model/Post')
+const fs = require('fs');
+const uuid = require('uuid');
+const dayjs = require('dayjs');
 
+const config = require('./../config');
+
+// const Util = require('./../common/util');
+
+const mkdir = require('make-dir');
 class ContentController {
     async getPostList(ctx) {
         const body = ctx.query
-        // 测试数据
-        // const post = new Post({
-        //     title: 'title',
-        //     content: 'content',
-        //     catalog: 'ask',
-        //     fav: '0',
-        //     isEnd: '0',
-        //     reads: '0',
-        //     answer: '0',
-        //     status: '0',
-        //     isTop: '0',
-        //     sort: '0',
-        //     tags: [
-        //         { name: '精华', class: '' },
-        //         { name: '置顶', class: '' },
-        //     ],
-        // })
-        // const tmp = await post.save()
 
         const sort = body.sort ? body.sort : 'created';
         const page = body.page ? parseInt(body.page) : 0;
@@ -48,6 +38,49 @@ class ContentController {
             data: result,
             // data: post,
             message: 'success'
+        }
+    }
+    // 上传
+    async uploadFile(ctx) {
+        console.log(ctx.request.files);
+        const file = ctx.request.files.file
+
+        // 图片名称 图片格式 存储位置 返回前台可读取的路径
+        const ext = file.name.split('.').pop()
+        const dir = `${config.uploadPath}/${dayjs().format('YYYYMMDD')}`
+        // 判断路径是否存在  不存在则创建
+        // await Util.dirExists(dir)
+        await mkdir(dir)
+        // 存储文件到指定路径 
+        // 给文件唯一名称
+        const picname = uuid.v4();
+        const destPath = `${dir}/${picname}.${ext}`
+        console.log('dir', dir);
+        const reader = fs.createReadStream(file.path)
+        const upStream = fs.createWriteStream(destPath)
+        const filePath = `/${dayjs().format('YYYYMMDD')}/${picname}.${ext}`
+        // mehtod1
+        reader.pipe(upStream)
+
+        // method2
+        // let totalLength = 0
+        // reader.on('data', chunk => {
+        //     totalLength += chunk.length
+        //     if (upStream.write(chunk) === false) {
+        //         reader.pause()
+        //     }
+        // })
+        // reader.on('drain', () => {
+        //     reader.resume()
+        // })
+        // reader.on('end', () => {
+        //     upStream.end()
+        // })
+
+        ctx.body = {
+            code: 200,
+            message: '上传成功!',
+            data: filePath
         }
     }
 }
