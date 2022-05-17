@@ -11,8 +11,10 @@ const UserController = require('./../../api/UserController')
 router.prefix('/user')
 
 router.get('/user', user)
-
 // 用户签到接口
 router.get('/sign', UserController.userSign)
+// 用户基本信息
+router.post('/basic', UserController.updateUserInfo)
+
 
 module.exports = router

@@ -28,10 +28,16 @@ UserSchema.pre('save', function (next) {
 })
 
 
+UserSchema.pre('updateOne', function (next) {
+    this.updated = dayjs().format('YYYY-MM-DD hh:mm:ss')
+    next()
+})
+
 UserSchema.pre('update', function (next) {
     this.updated = dayjs().format('YYYY-MM-DD hh:mm:ss')
     next()
 })
+
 
 UserSchema.post('save', function (error, doc, next) {
     if (error.name == 'MongoError' && error.code === 11000) {
