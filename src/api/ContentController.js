@@ -42,9 +42,7 @@ class ContentController {
     }
     // 上传
     async uploadFile(ctx) {
-        console.log(ctx.request.files);
         const file = ctx.request.files.file
-
         // 图片名称 图片格式 存储位置 返回前台可读取的路径
         const ext = file.name.split('.').pop()
         const dir = `${config.uploadPath}/${dayjs().format('YYYYMMDD')}`
@@ -55,13 +53,11 @@ class ContentController {
         // 给文件唯一名称
         const picname = uuid.v4();
         const destPath = `${dir}/${picname}.${ext}`
-        console.log('dir', dir);
         const reader = fs.createReadStream(file.path)
         const upStream = fs.createWriteStream(destPath)
         const filePath = `/${dayjs().format('YYYYMMDD')}/${picname}.${ext}`
         // mehtod1
         reader.pipe(upStream)
-
         // method2
         // let totalLength = 0
         // reader.on('data', chunk => {
@@ -76,7 +72,9 @@ class ContentController {
         // reader.on('end', () => {
         //     upStream.end()
         // })
-
+        //更新用户表里的头像信息
+        // await 
+        // 返回数据
         ctx.body = {
             code: 200,
             message: '上传成功!',
