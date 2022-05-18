@@ -3,14 +3,18 @@ const jsonwebtoken = require('jsonwebtoken')
 const config = require('../../config/index')
 const bcrypt = require('bcrypt');
 const dayjs = require('dayjs');
-const { checkCapchat } = require('../../common/util')
-
+const { checkCapchat, getJWTPayload } = require('../../common/util')
 const User = require('../../model/user');
-
 const SignRecord = require('./../../model/SignRecord');
+
+const send = require('./../../config/MailConfig')
+const uuid = require('uuid')
+const { setValue, getValue } = require('../../config/RedisConfig');
+
 
 class LoginController {
     constructor() { }
+    // 登录
     async login(ctx) {
         // 1. 接收数据
         // 2. 验证图片验证码的时效性 正确性
@@ -83,7 +87,7 @@ class LoginController {
             }
         }
     }
-
+    // 注册
     async reg(ctx) {
         // 1.接收客户端数据
         const { body } = ctx.request
@@ -132,6 +136,82 @@ class LoginController {
                 code: 401,
                 message: message
             }
+        }
+    }
+    // 找回密码
+    async retrievePwd(ctx) {
+
+        const body = ctx.query;
+        if (body.name) {
+            // 查看是否存在用户
+            const obj = await User.findOne({ name: body.name })
+            if (obj) {
+                // 如果用户存在 发送邮件 用户点击邮件前往重置密码
+
+                let key = uuid.v4();
+
+                await setValue(key, jsonwebtoken.sign({ _id: obj._id },
+                    config.JWT_SECRET, {
+                    expiresIn: '30m'
+                }
+                ))
+
+                await send({
+                    type: 'reset',
+                    data: {
+                        key,
+                        name: body.name,
+                    },
+                    email: body.name,
+                    user: obj.nickname,
+                    expire: dayjs().add(30, 'minutes').format('YYYY-MM-DD HH:mm:ss'),
+
+                })
+
+                ctx.body = {
+                    code: 200,
+                    message: '邮件已发送，请前往邮件链接重置密码！'
+                }
+            } else {
+                ctx.body = {
+                    code: 500,
+                    message: '用户不存在！'
+                }
+            }
+
+        } else {
+            ctx.body = {
+                code: 500,
+                message: '用户名不能为空！'
+            }
+        }
+
+    }
+
+    // 重置密码
+    async resetPwd(ctx) {
+        const body = ctx.query;
+        if (body.key) {
+            const token = await getValue(body.key)
+            const obj = await getJWTPayload('Bearer ' + token)
+            if (body.password === body.surepassword) {
+                // 密码保存还有问题
+                await User.updateOne({ _id: obj._id }, {
+                    password: body.password,
+                })
+                ctx.body = {
+                    code: 200,
+                    message: '密码重置成功!'
+                }
+            } else {
+                ctx.body = {
+                    code: 500,
+                    message: {
+                        surepassword: '两次密码输入不一致!'
+                    }
+                }
+            }
+
         }
     }
 }
