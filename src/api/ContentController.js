@@ -6,7 +6,9 @@ const dayjs = require('dayjs');
 
 const config = require('./../config');
 
-// const Util = require('./../common/util');
+const User = require('./../model/user');
+
+const { getJWTPayload } = require('./../common/util');
 
 const mkdir = require('make-dir');
 class ContentController {
@@ -56,6 +58,10 @@ class ContentController {
         const reader = fs.createReadStream(file.path)
         const upStream = fs.createWriteStream(destPath)
         const filePath = `/${dayjs().format('YYYYMMDD')}/${picname}.${ext}`
+
+        // 手动拼接 
+        const url = 'http://localhost:9090' + filePath
+
         // mehtod1
         reader.pipe(upStream)
         // method2
@@ -73,12 +79,24 @@ class ContentController {
         //     upStream.end()
         // })
         //更新用户表里的头像信息
-        // await 
+
+        const obj = await getJWTPayload(ctx.header.authorization)
+
+        await User.updateOne({
+            _id: obj._id
+        },
+            {
+                $set: {
+                    pic: url
+                }
+            }
+        )
+
         // 返回数据
         ctx.body = {
             code: 200,
             message: '上传成功!',
-            data: filePath
+            data: url
         }
     }
 }

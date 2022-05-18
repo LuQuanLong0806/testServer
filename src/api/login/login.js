@@ -21,7 +21,6 @@ class LoginController {
         // 3. 验证用户账号密码是否正确
         // 4. 返回 token
         const { body } = ctx.request
-        console.log(body);
         // 获取用户传过来的验证码和sid
         let { capchat, sid } = body;
         // 封装一个验证验证码是否正确的方法
@@ -196,8 +195,9 @@ class LoginController {
             const obj = await getJWTPayload('Bearer ' + token)
             if (body.password === body.surepassword) {
                 // 密码保存还有问题
+                let newpwd = await bcrypt.hash(body.password, 5)
                 await User.updateOne({ _id: obj._id }, {
-                    password: body.password,
+                    $set: { password: newpwd }
                 })
                 ctx.body = {
                     code: 200,

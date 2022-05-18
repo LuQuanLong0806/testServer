@@ -13,8 +13,11 @@ router.prefix('/user')
 router.get('/user', user)
 // 用户签到接口
 router.get('/sign', UserController.userSign)
-// 用户基本信息
+// 更新用户基本信息
 router.post('/basic', UserController.updateUserInfo)
+router.post('/changePassword', UserController.changePassword)
+// 获取用户信息
+router.post('/info', UserController.userInfo)
 
 
 

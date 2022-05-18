@@ -3,6 +3,8 @@ const dayjs = require('dayjs');
 const uuid = require('uuid');
 const jwt = require('jsonwebtoken');
 
+const bcrypt = require('bcrypt');
+
 const SignRecord = require('./../model/SignRecord');
 const { getJWTPayload } = require('./../common/util');
 
@@ -230,7 +232,6 @@ class UserController {
         }
     }
     // 更新用户名
-
     async updateUserName(ctx) {
         const body = ctx.query;
         if (body.key) {
@@ -244,9 +245,55 @@ class UserController {
                 message: '用户名更改成功!'
             }
         }
+    }
+    // 修改密码接口
+    async changePassword(ctx) {
+        const { body } = ctx.request
+
+        const obj = await getJWTPayload(ctx.header.authorization);
+
+        const user = await User.findOne({ _id: obj._id })
+        // 如果当前密码和数据库密码一致 就更新新密码
+        if (body.newpwd !== body.surepassword || await bcrypt.compare(body.oldpwd, user.password)) {
+            const newpassword = await bcrypt.hash(body.newpwd, 5)
+            const result = await User.updateOne(
+                { _id: obj._id },
+                { $set: { password: newpassword } }
+            )
+            ctx.body = {
+                code: 200,
+                message: '密码修改成功!请重新登录!'
+            }
+        } else {
+            ctx.body = {
+                code: 500,
+                message: '密码修改失败, 请检查输入是否正确!'
+            }
+        }
 
     }
 
+    // 获取用户信息接口
+    async userInfo(ctx) {
+        const { body } = ctx.request
+
+        if (body.name) {
+            const result = await User.findOne({
+                name: body.name
+            })
+
+            let arr = ['password'];
+            let obj = JSON.parse(JSON.stringify(result))
+            arr.map(d => { delete obj[d] })
+            ctx.body = {
+                code: 200,
+                data: obj,
+                message: 'SUCCESS!'
+            }
+
+        }
+
+    }
 }
 
 module.exports = new UserController()
