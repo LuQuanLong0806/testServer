@@ -19,6 +19,7 @@ const UserSchema = new Schema({
     regmark: { type: String },
     location: { type: String },
     isVip: { type: String, default: '0' },
+    isSign: { type: Boolean, default: false },
     count: { type: Number, default: 0 },
 })
 

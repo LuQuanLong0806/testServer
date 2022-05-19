@@ -21,19 +21,13 @@ async function send(sendInfo = {}) {
         secure: false, // true for 465, false for other ports
         auth: {
             // user: testAccount.user, // generated ethereal user
+            //   pass: 'ahfygatujrtybfbi', // generated ethereal password
+
             user: '790143432@qq.com', // generated ethereal user
             pass: 'lqjrkrhiidvabedd', // generated ethereal password
-            //   pass: 'ahfygatujrtybfbi', // generated ethereal password
 
         },
     });
-
-    //   let sendInfo = {
-    //       code:'1234',
-    //       expire: '2019-10-01',
-    //       email: '790143432@qq.com',
-    //       user: 'Lu'
-    //   }
 
     const route = sendInfo.type === 'email' ? '/confirm' : '/entrance/reset';
     // 跳转链接

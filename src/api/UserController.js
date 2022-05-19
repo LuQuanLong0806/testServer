@@ -23,10 +23,9 @@ class UserController {
 
         // 保存用户签到数据
         let newRecord = {}
-
-        // 1.
+        // 1. 获取用户信息
         const obj = await getJWTPayload(ctx.header.authorization);
-        // 2.
+        // 2. 获取用户最近一次的签到数据
         const record = await SignRecord.findByUid(obj._id)
 
         const user = await User.findById(obj._id)
@@ -48,13 +47,11 @@ class UserController {
             } else {
                 let count = user.count;
                 let fav = 0; // 本次签到增加的积分
-
                 let result = {}
-
                 // 如果今天没有签到
                 // 判断上次签到是什么时候
                 // 判断是否连续签到
-                if (dayjs(record.created).format('YYYY-MM-DD') === dayjs().subtract(1, 'days').format('YYYY - MM - DD')) {
+                if (dayjs(record.created).format('YYYY-MM-DD') === dayjs().subtract(1, 'days').format('YYYY-MM-DD')) {
                     // 如果用户上次签到日期 == 昨天  说明用户连续签到
                     count += 1
                     // 用户积分增加逻辑
@@ -99,14 +96,9 @@ class UserController {
                             _id: obj._id
                         },
                         {
-                            $set: {
-                                count: 1
-                            },
+                            $set: { count: 1 },
                             // user.favs += fav
-                            // user.count += 1
-                            $inc: {
-                                favs: fav
-                            }
+                            $inc: { favs: fav }
                         }
                     )
 
@@ -272,27 +264,33 @@ class UserController {
         }
 
     }
-
     // 获取用户信息接口
     async userInfo(ctx) {
-        const { body } = ctx.request
+        // 获取用户信息
+        const obj = await getJWTPayload(ctx.header.authorization);
+        // 获取用户数据
+        const user = await User.findById(obj._id)
+        // 判断用户今天是否签到 用户签到数据
+        const record = await SignRecord.findByUid({ _id: obj._id });
 
-        if (body.name) {
-            const result = await User.findOne({
-                name: body.name
-            })
-
-            let arr = ['password'];
-            let obj = JSON.parse(JSON.stringify(result))
-            arr.map(d => { delete obj[d] })
-            ctx.body = {
-                code: 200,
-                data: obj,
-                message: 'SUCCESS!'
-            }
-
+        let isSign = false
+        // 如果签到数据是今天 说明今天签到过了
+        if (dayjs(record.created).format('YYYY-MM-DD')
+            ===
+            dayjs().format('YYYY-MM-DD')) {
+            isSign = true
         }
-
+        // 去掉敏感信息
+        let arr = ['password'];
+        let result = JSON.parse(JSON.stringify(user))
+        arr.map(d => { delete result[d] })
+        result.isSign = isSign
+        // 返回数据
+        ctx.body = {
+            code: 200,
+            data: result,
+            message: 'SUCCESS!'
+        }
     }
 }
 
