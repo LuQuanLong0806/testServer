@@ -74,14 +74,12 @@ class UserController {
                             _id: obj._id
                         },
                         {
-                            // user.favs += fav
                             // user.count += 1
                             $inc: {
-                                favs: fav, count: 1
+                                favs: fav, count: 1 // user.favs += fav
                             }
                         }
                     )
-
                     result = {
                         favs: user.favs + fav,
                         count: user.count + 1
@@ -97,23 +95,21 @@ class UserController {
                         },
                         {
                             $set: { count: 1 },
-                            // user.favs += fav
-                            $inc: { favs: fav }
+                            $inc: { favs: fav } // user.favs += fav
                         }
                     )
-
-                    // 更新签到记录表
-                    newRecord = new SignRecord({
-                        uid: obj._id,
-                        favs: fav,
-                    })
-                    await newRecord.save()
-
                     result = {
                         favs: user.favs + 5,
                         count: 1
                     }
                 }
+
+                // 更新签到记录表
+                newRecord = new SignRecord({
+                    uid: obj._id,
+                    favs: fav,
+                })
+                await newRecord.save()
 
                 // 返回
                 ctx.body = {
@@ -121,10 +117,9 @@ class UserController {
                     data: result,
                     message: '签到成功!'
                 }
-
             }
-
         } else {
+            // 更新用户表
             // 无签到数据 也就是第一次签到
             await user.updateOne(
                 {
@@ -142,8 +137,6 @@ class UserController {
                 favs: 5,
             })
             await newRecord.save();
-
-            // 更新用户表
 
             // 返回数据
             ctx.body = {
@@ -275,7 +268,7 @@ class UserController {
 
         let isSign = false
         // 如果签到数据是今天 说明今天签到过了
-        if (dayjs(record.created).format('YYYY-MM-DD')
+        if (record && dayjs(record.created).format('YYYY-MM-DD')
             ===
             dayjs().format('YYYY-MM-DD')) {
             isSign = true
