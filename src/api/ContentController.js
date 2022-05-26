@@ -1,16 +1,18 @@
 
-const Post = require('./../model/Post')
 const fs = require('fs');
 const uuid = require('uuid');
 const dayjs = require('dayjs');
+const mkdir = require('make-dir');
+
+
+const Post = require('./../model/Post')
 
 const config = require('./../config');
 
 const User = require('./../model/user');
 
-const { getJWTPayload } = require('./../common/util');
+const { getJWTPayload, checkCaptcha } = require('./../common/util');
 
-const mkdir = require('make-dir');
 class ContentController {
     async getPostList(ctx) {
         const body = ctx.query
@@ -31,9 +33,9 @@ class ContentController {
             options.isEnd = body.status
         }
 
-        if (typeof body.tag != 'undefined' && body.tag != '') {
-            options.tags = { $elementMatch: { name: body.tag } }
-        }
+        // if (typeof body.tag != 'undefined' && body.tag != '') {
+        //     options.tags = { $elementMatch: { name: body.tag } }
+        // }
         const result = await Post.getList(options, sort, page, limit)
         ctx.body = {
             code: 200,
@@ -97,6 +99,49 @@ class ContentController {
             code: 200,
             message: '上传成功!',
             data: url
+        }
+    }
+    // 发帖
+    async addPost(ctx) {
+        const { body } = ctx.request
+        const { captcha, sid } = body
+        // 验证图片验证码的时效性, 正确性
+        const result = await checkCaptcha(sid, captcha)
+
+
+        if (result) {
+            const obj = await getJWTPayload(ctx.header.authorization)
+            const userObj = await User.findById({ _id: obj._id })
+            // 判断用户的积分数是否>fav 否则 用户积分不足
+
+            if (userObj.favs < body.fav) {
+                ctx.body = {
+                    code: 501,
+                    message: '积分不足!'
+                }
+                return
+            } else {
+                // 用户积分足够 发帖 减除用户积分
+                await User.updateOne({ _id: obj._id }, {
+                    $inc: {
+                        favs: -body.fav
+                    }
+                })
+            }
+            const newPost = new Post(body)
+            newPost.uid = obj._id;
+            const result = await newPost.save();
+            ctx.body = {
+                code: 200,
+                message: '发布成功!',
+                data: result
+            }
+
+        } else {
+            ctx.body = {
+                code: 500,
+                message: '验证码不正确!',
+            }
         }
     }
 }

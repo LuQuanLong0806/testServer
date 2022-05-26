@@ -3,7 +3,7 @@ const jsonwebtoken = require('jsonwebtoken')
 const config = require('../../config/index')
 const bcrypt = require('bcrypt');
 const dayjs = require('dayjs');
-const { checkCapchat, getJWTPayload } = require('../../common/util')
+const { checkCaptcha, getJWTPayload } = require('../../common/util')
 const User = require('../../model/user');
 const SignRecord = require('./../../model/SignRecord');
 
@@ -22,9 +22,9 @@ class LoginController {
         // 4. 返回 token
         const { body } = ctx.request
         // 获取用户传过来的验证码和sid
-        let { capchat, sid } = body;
+        let { captcha, sid } = body;
         // 封装一个验证验证码是否正确的方法
-        let result = await checkCapchat(sid, capchat);
+        let result = await checkCaptcha(sid, captcha);
         if (result) {
             // 验证用户账号密码是否正确
             let user = await User.findOne({ name: body.name })
@@ -91,11 +91,11 @@ class LoginController {
         // 1.接收客户端数据
         const { body } = ctx.request
         // 2.检验验证码的内容
-        let { capchat, sid } = body;
+        let { captcha, sid } = body;
         let message = {}
         let check = true
         // 封装一个验证验证码是否正确的方法
-        let result = await checkCapchat(sid, capchat);
+        let result = await checkCaptcha(sid, captcha);
         if (result) {
             // 3.查库查看是否存在 和 nick那么是否存在
             let user1 = await User.findOne({ name: body.name })
@@ -130,7 +130,7 @@ class LoginController {
             }
             // 4.保存数据
         } else {
-            message.capchat = ['验证码不正确!']
+            message.captcha = ['验证码不正确!']
             ctx.body = {
                 code: 401,
                 message: message

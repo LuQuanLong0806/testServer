@@ -9,10 +9,11 @@ const getJWTPayload = token => {
   return jwt.verify(token.split(' ')[1], config.JWT_SECRET)
 }
 
-const checkCapchat = async (sid, value) => {
+const checkCaptcha = async (sid, value) => {
   // 获取之前的验证码
   let code = await getValue(sid)
   let res = false
+
   if (code) {
     if (value.toLowerCase() == code.toLowerCase()) {
       res = true
@@ -62,7 +63,7 @@ const dirExists = async (dir) => {
 }
 
 module.exports = {
-  checkCapchat,
+  checkCaptcha,
   getJWTPayload,
   dirExists
 }

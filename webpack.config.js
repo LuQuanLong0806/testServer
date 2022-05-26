@@ -4,7 +4,7 @@ const path = require('path')
 
 const nodeExternals = require('webpack-node-externals')
 
-const {CleanWebpackPlugin} = require('clean-webpack-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 
 const webpackConfig = {
     target: 'node',
@@ -12,29 +12,35 @@ const webpackConfig = {
     entry: {
         server: path.join(__dirname, 'src/index.js')
     },
-    output: {
-        filename:'[name].bundle.js',
-        path: path.join(__dirname, './dist') ,
+    resolve: {
+        // 设置别名
+        alias: {
+            '@': path.resolve(__dirname, 'src')// 这样配置后 @ 可以指向 src 目录
+        }
     },
-    devtool:'eval-source-map', // 调试模式
-    module:{
-        rules:[
+    output: {
+        filename: '[name].bundle.js',
+        path: path.join(__dirname, './dist'),
+    },
+    devtool: 'eval-source-map', // 调试模式
+    module: {
+        rules: [
             {
                 test: /\.(js|jsx)$/,
-                use:[
+                use: [
                     {
                         loader: 'babel-loader'
                     }
                 ],
-                exclude:[path.join(__dirname, '/node_modules')]
+                exclude: [path.join(__dirname, '/node_modules')]
             }
         ]
     },
-    externals:[nodeExternals()],
-    plugins:[
+    externals: [nodeExternals()],
+    plugins: [
         new CleanWebpackPlugin()
     ],
-    node:{
+    node: {
         console: true,
         global: true,
         process: true,

@@ -10,6 +10,12 @@ const webpack = require('webpack')
 const webpackConfig = {
   target: 'node',
   // mode: 'development',
+  resolve: {
+    // 设置别名
+    alias: {
+      '@': path.resolve(__dirname, 'src')// 这样配置后 @ 可以指向 src 目录
+    }
+  },
   entry: {
     server: path.join(__dirname, '../src/index.js')
   },
