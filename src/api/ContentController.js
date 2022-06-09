@@ -11,7 +11,7 @@ const config = require('./../config');
 
 const User = require('./../model/user');
 
-const { getJWTPayload, checkCaptcha } = require('./../common/util');
+const { getJWTPayload, checkCaptcha, rename } = require('./../common/util');
 
 class ContentController {
     async getPostList(ctx) {
@@ -143,6 +143,30 @@ class ContentController {
                 message: '验证码不正确!',
             }
         }
+    }
+
+    // 帖子详情
+    async getPostDetail(ctx) {
+        const params = ctx.query;
+
+        if (!params.tid) {
+            ctx.body = {
+                code: 500,
+                message: '文章id不能为空!',
+            }
+        } else {
+
+            const post = await Post.findByTid(params.tid)
+            // const result = rename(JSON.parse(JSON.stringify(post)), 'uid', 'user')
+            ctx.body = {
+                code: 200,
+                message: 'success!',
+                // data: result
+                data: post
+            }
+        }
+
+
     }
 }
 

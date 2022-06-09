@@ -47,6 +47,14 @@ PostSchema.statics = {
                 path: 'uid',
                 select: 'name isVip pic'
             })
+    },
+
+    findByTid: function (id) {
+        // mogoose de populate 方法
+        return this.findOne({ _id: id }).populate({
+            path: 'uid',
+            select: 'nickname pic isVip _id'
+        })
     }
 }
 

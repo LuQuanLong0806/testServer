@@ -9,7 +9,6 @@ router.prefix('/public')
 router.get('/list', ContentController.getPostList)
 
 // 修改用户名
-
 router.get('/resetEail', UserController.updateUserName)
 
 

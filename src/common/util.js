@@ -22,6 +22,15 @@ const checkCaptcha = async (sid, value) => {
   return res
 }
 
+const rename = (obj, key, newKey) => {
+  if (Object.keys(obj).indexOf(key) != -1) {
+    obj[newKey] = obj[key]
+    delete obj[key]
+  }
+  return obj
+}
+
+
 const mkdir = path => {
   return new Promise(resolve => {
     fs.mkdir(dir, err => err ? resolve(false) : resolve(true))
@@ -65,5 +74,6 @@ const dirExists = async (dir) => {
 module.exports = {
   checkCaptcha,
   getJWTPayload,
-  dirExists
+  dirExists,
+  rename
 }
