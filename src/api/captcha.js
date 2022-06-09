@@ -9,18 +9,12 @@ class PublicController {
 
         const body = ctx.request.query
 
-        console.log('sid', body.sid);
-
         const newCaptcha = svgCaptcha.create({
             noise: Math.floor(Math.random() * 6),
             color: true,
             ignoreChars: '0o1li'
         })
-        // {
-        //     text: 'xxxx', 
-        //     data: 'base64'
-        // }
-        console.log('newCaptcha', newCaptcha.text);
+   
         // 保存图片验证码数据 设置超时时间  单位 : s
         setValue(body.sid, newCaptcha.text, 60)
         // getValue(body.sid).then(res => {
