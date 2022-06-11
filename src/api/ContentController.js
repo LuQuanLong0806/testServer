@@ -62,7 +62,7 @@ class ContentController {
         const filePath = `/${dayjs().format('YYYYMMDD')}/${picname}.${ext}`
 
         // 手动拼接 
-        const url = 'http://localhost:9090' + filePath
+        const url = config.fileUrl + filePath
 
         // mehtod1
         reader.pipe(upStream)
@@ -156,7 +156,16 @@ class ContentController {
             }
         } else {
 
+            await Post.updateOne({
+                _id: params.tid
+            }, {
+                $inc: {
+                    reads: 1
+                }
+            })
+
             const post = await Post.findByTid(params.tid)
+
             // const result = rename(JSON.parse(JSON.stringify(post)), 'uid', 'user')
             ctx.body = {
                 code: 200,

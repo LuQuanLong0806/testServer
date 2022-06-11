@@ -29,7 +29,7 @@ async function send(sendInfo = {}) {
         },
     });
 
-    const route = sendInfo.type === 'email' ? '/confirm' : '/entrance/reset';
+    const route = sendInfo.type === 'email' ? '/confirm' : '/reset';
     // 跳转链接
     const url = `${config.baseUrl}/#${route}?` + qs.stringify(sendInfo.data)
     // 生成邮件模板字符

@@ -11,7 +11,12 @@ const Redis = {
 // JWT_SECRET
 const JWT_SECRET = 'aWS!23&*HJSH$!&*ASF!%^5523*SAFL^5AF2z56sf5wAF*@5#%!%SF55q85'
 
-const baseUrl = 'http://localhost:8081';
+// 邮件前端地址
+const baseUrl = 'http://localhost:8080';
+
+// 服务器端文件地址
+const fileUrl = 'http://localhost:9090';
+
 
 const uploadPath = process.env.NODE_ENV === 'production' ? '/app/public' :
   path.join(path.resolve(__dirname, '../public'))
@@ -21,5 +26,6 @@ module.exports = {
   Redis: Redis,
   JWT_SECRET,
   baseUrl,
-  uploadPath
+  uploadPath,
+  fileUrl
 }

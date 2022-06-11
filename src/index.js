@@ -38,6 +38,7 @@ const middleware = compose([
     koaJson(),
     koaBody({
         multipart: true,
+        // 限制大小
         formidable: {
             keepExtensions: true,
             maxFieldsSize: 5 * 1024 * 1024
