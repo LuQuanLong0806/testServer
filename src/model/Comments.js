@@ -9,6 +9,7 @@ const CommentsSchema = new Schema({
     tid: { type: String, ref: 'posts' }, // ref 指定的链接表名
     cuid: { type: String, ref: 'users' }, // ref 指定的链接表名  对应这张表的_id属性
     created: { type: Date },
+    updated: { type: Date },
     content: { type: String },
     hands: { type: Number, default: 0 },
     status: { type: String, default: '0' },
@@ -21,6 +22,12 @@ CommentsSchema.pre('save', function (next) {
     this.created = dayjs().format('YYYY-MM-DD HH:mm:ss');
     next()
 })
+
+CommentsSchema.pre('update', function (next) {
+    this.updated = dayjs().format('YYYY-MM-DD HH:mm:ss');
+    next()
+})
+
 
 CommentsSchema.statics = {
     /**

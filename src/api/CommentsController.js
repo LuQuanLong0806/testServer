@@ -30,7 +30,7 @@ class CommentsController {
     }
 
     // 添加评论
-    async addComments(ctx) {
+    async addComment(ctx) {
         const { body } = ctx.request
         // 判断验证码是否正确
         let check = true // await checkCaptcha(body.sid, body.code)
@@ -53,8 +53,65 @@ class CommentsController {
                 }
             }
         }
+    }
+    // 更新评论
+    async updateComment(ctx) {
+        const { body } = ctx.request
+        // 判断验证码是否正确
+        let check = true // await checkCaptcha(body.sid, body.code)
+        if (check) {
+            // 需要评论的数据 id 和 用户id
+            if (!body.id) {
+                ctx.body = {
+                    code: 401,
+                    message: 'id不能为空!'
+                }
+            } else {
+                // 判断用户id是否相同
+                const coment = await Comments.findOne({
+                    _id: body.id
+                })
+                if (body.cuid !== coment.cuid) {
+                    // 非本人操作
+                    ctx.body = {
+                        code: 500,
+                        message: '只有本人才可更改评论!'
+                    }
+                } else if (false) {
+                    // 判断用户是否被禁言
 
+                }
+                else {
 
+                    // 更新并返回
+                    // const obj = getJWTPayload(ctx.header.authorization)
+
+                    // 添加评论内容
+                    const result = await Comments.updateOne({
+                        _id: body.id
+                    }, {
+                        $set: {
+                            content: body.content,
+                        }
+                    })
+
+                    console.log('result', result);
+                    ctx.body = {
+                        code: 200,
+                        data: result,
+                        message: 'success!'
+                    }
+                }
+            }
+        } else {
+            // 查询用户是否点赞
+            ctx.body = {
+                code: 500,
+                message: {
+                    captcha: ['验证码不正确!']
+                }
+            }
+        }
     }
 }
 
