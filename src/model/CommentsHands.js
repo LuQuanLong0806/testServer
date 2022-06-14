@@ -6,10 +6,10 @@ const dayjs = require('dayjs');
 const Schema = mongoose.Schema
 // 定义数据类型
 const CommentsHandsSchema = new Schema({
-    tid: { type: String, ref: 'posts' }, // ref 指定的链接表名
-    cuid: { type: String, ref: 'users' }, // ref 指定的链接表名
+    cid: { type: String }, // ref 指定的链接表名
+    uid: { type: String }, // ref 指定的链接表名
     created: { type: Date },
-    hands: { type: Number, default: 0 },
+    // hands: { type: Number, default: 0 },
 })
 
 // 保存的时候自动设置时间
@@ -17,6 +17,14 @@ CommentsHandsSchema.pre('save', function (next) {
     this.created = dayjs().format('YYYY-MM-DD HH:mm:ss');
     next()
 })
+CommentsHandsSchema.post('save', function (error, doc, next) {
+    if (error.name === 'MongoError' && error.code === 11000) {
+        next(new Error('There was a duplicate key error!'))
+    } else {
+        next(error)
+    }
+})
+
 
 CommentsHandsSchema.statics = {
     /**
@@ -28,7 +36,7 @@ CommentsHandsSchema.statics = {
      * @returns 
      */
 
-    findByTid: function (id) {
+    findByCid: function (id) {
         return this.find({ _id: id })
     }
 }
