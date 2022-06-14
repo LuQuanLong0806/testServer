@@ -113,6 +113,36 @@ class CommentsController {
             }
         }
     }
+
+    // 点赞
+    async hands(ctx) {
+        const { body } = ctx.request
+        // 判断验证码是否正确
+        // 需要评论的数据 id 和 用户id
+        if (!body.id) {
+            ctx.body = {
+                code: 401,
+                message: 'id不能为空!'
+            }
+        } else {
+            // 更新并返回
+            // const obj = getJWTPayload(ctx.header.authorization)
+            // 添加评论内容
+            const result = await Comments.updateOne({
+                _id: body.id
+            }, {
+                $set: {
+                    content: body.content,
+                }
+            })
+
+            ctx.body = {
+                code: 200,
+                data: result,
+                message: 'success!'
+            }
+        }
+    }
 }
 
 module.exports = new CommentsController()
