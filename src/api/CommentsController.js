@@ -12,7 +12,7 @@ const canReply = async (ctx) => {
     if (!obj._id || typeof obj._id == 'undefined') {
         return false
     } else {
-        const result = await User.findById(id)
+        const result = await User.findById(obj._id)
         if (result.status == 0) {
             return true
         }
