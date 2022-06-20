@@ -11,6 +11,8 @@ const config = require('./../config');
 
 const User = require('./../model/user');
 
+const Collection = require('./../model/Collection')
+
 const { getJWTPayload, checkCaptcha, rename } = require('./../common/util');
 
 class ContentController {
@@ -148,7 +150,7 @@ class ContentController {
     // 帖子详情
     async getPostDetail(ctx) {
         const params = ctx.query;
-
+        const obj = getJWTPayload(ctx.header.authorization)
         if (!params.tid) {
             ctx.body = {
                 code: 500,
@@ -167,16 +169,79 @@ class ContentController {
             const post = await Post.findByTid(params.tid)
 
             // const result = rename(JSON.parse(JSON.stringify(post)), 'uid', 'user')
+            const result = JSON.parse(JSON.stringify(post))
+            // 是否收藏帖子
+            if (obj._id && typeof obj._id != 'undefined') {
+                const cols = await Collection.find({ tid: params.tid, uid: obj._id })
+                if (cols && cols.length > 0) {
+                    result.isCollect = 1
+                }
+            }
             ctx.body = {
                 code: 200,
                 message: 'success!',
-                // data: result
-                data: post
+                data: result
             }
         }
 
 
     }
+
+    // 收藏帖子
+    async collectPost(ctx) {
+        // uid  tid
+        const { body } = ctx.request
+        // 是否传参
+        const obj = getJWTPayload(ctx.header.authorization)
+        if (typeof body.tid == 'undefined' || !body.tid) {
+            ctx.body = {
+                code: 500,
+                message: 'id不能为空!',
+            }
+            return
+        }
+        if (typeof obj._id == 'undefined' || !obj._id) {
+            ctx.body = {
+                code: 401,
+                message: '登录后再进行操作!',
+            }
+            return
+        }
+
+        // 是否已收藏
+        const cts = await Collection.find({ tid: body.tid, uid: obj._id })
+        if (cts && cts.length > 0) {
+            ctx.body = {
+                code: 500,
+                message: '已经收藏过了!',
+            }
+        } else {
+            const collect = new Collection({
+                tid: body.tid,
+                uid: obj._id
+            })
+            // 
+            const result = await collect.save()
+            if (result) {
+                ctx.body = {
+                    code: 200,
+                    message: '收藏成功!',
+                }
+            } else {
+                ctx.body = {
+                    code: 500,
+                    message: '收藏失败!',
+                }
+            }
+        }
+
+
+    }
+    // 取消收藏
+    async cancelCollect(ctx) {
+
+    }
+
 }
 
 module.exports = new ContentController()
