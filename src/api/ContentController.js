@@ -20,7 +20,7 @@ class ContentController {
         const body = ctx.query
 
         const sort = body.sort ? body.sort : 'created';
-        const page = body.page ? parseInt(body.page) : 0;
+        const page = body.page ? parseInt(body.page) : 1;
         const limit = body.limit ? parseInt(body.limit) : 20;
 
         let options = {}
@@ -184,7 +184,6 @@ class ContentController {
             }
         }
 
-
     }
 
     // 收藏帖子
@@ -193,13 +192,7 @@ class ContentController {
         const { body } = ctx.request
         // 是否传参
         const obj = getJWTPayload(ctx.header.authorization)
-        if (typeof body.tid == 'undefined' || !body.tid) {
-            ctx.body = {
-                code: 500,
-                message: 'id不能为空!',
-            }
-            return
-        }
+
         if (typeof obj._id == 'undefined' || !obj._id) {
             ctx.body = {
                 code: 401,
@@ -208,31 +201,53 @@ class ContentController {
             return
         }
 
-        // 是否已收藏
-        const cts = await Collection.find({ tid: body.tid, uid: obj._id })
-        if (cts && cts.length > 0) {
+        if (typeof body.tid == 'undefined' || !body.tid) {
             ctx.body = {
                 code: 500,
-                message: '已经收藏过了!',
+                message: 'id不能为空!',
+            }
+            return
+        }
+
+        // 是否已收藏
+
+        // 取消收藏
+        if (!body.isCollect) {
+            await Collection.deleteOne({ tid: body.tid, uid: obj._id })
+            ctx.body = {
+                code: 200,
+                message: '取消收藏!',
             }
         } else {
-            const collect = new Collection({
-                tid: body.tid,
-                uid: obj._id
-            })
-            // 
-            const result = await collect.save()
-            if (result) {
-                ctx.body = {
-                    code: 200,
-                    message: '收藏成功!',
-                }
-            } else {
+            const cts = await Collection.find({ tid: body.tid, uid: obj._id })
+            if (cts && cts.length > 0) {
                 ctx.body = {
                     code: 500,
-                    message: '收藏失败!',
+                    message: '已经收藏过了!',
                 }
+            } else {
+                // 收藏
+                const collect = new Collection({
+                    tid: body.tid,
+                    uid: obj._id,
+                    title: body.title
+                })
+                // 
+                const result = await collect.save()
+                if (result) {
+                    ctx.body = {
+                        code: 200,
+                        message: '收藏成功!',
+                    }
+                } else {
+                    ctx.body = {
+                        code: 500,
+                        message: '收藏失败!',
+                    }
+                }
+
             }
+
         }
 
 

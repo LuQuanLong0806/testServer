@@ -42,7 +42,7 @@ PostSchema.statics = {
     getList: function (options, sort, page, limit) {
         return this.find(options)
             .sort({ [sort]: -1 })
-            .skip(page * limit)
+            .skip((page - 1) * limit)
             .limit(limit)
             .populate({
                 path: 'uid',

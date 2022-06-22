@@ -19,7 +19,7 @@ router.post('/basic', UserController.updateUserInfo)
 router.post('/changePassword', UserController.changePassword)
 // 获取用户信息
 router.post('/info', UserController.userInfo)
-// 
-
+// 获取收藏帖子
+router.get('/collect/posts', UserController.getCollectPosts)
 
 module.exports = router
