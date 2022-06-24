@@ -262,30 +262,41 @@ class UserController {
     // 获取用户信息接口
     async userInfo(ctx) {
         // 获取用户信息
+        const { body } = ctx.request
         const obj = await getJWTPayload(ctx.header.authorization);
-        // 获取用户数据
-        const user = await User.findById(obj._id)
-        // 判断用户今天是否签到 用户签到数据
-        const record = await SignRecord.findByUid({ _id: obj._id });
+        let uid = body.uid ? body.uid : obj._id ? obj._id : '';
 
-        let isSign = false
-        // 如果签到数据是今天 说明今天签到过了
-        if (record && dayjs(record.created).format('YYYY-MM-DD')
-            ===
-            dayjs().format('YYYY-MM-DD')) {
-            isSign = true
+        if (uid) {
+            // 获取用户数据
+            const user = await User.findById(uid)
+            // 判断用户今天是否签到 用户签到数据
+            const record = await SignRecord.findByUid({ _id: obj._id });
+
+            let isSign = false;
+            // 如果签到数据是今天 说明今天签到过了
+            if (record && dayjs(record.created).format('YYYY-MM-DD')
+                ===
+                dayjs().format('YYYY-MM-DD')) {
+                isSign = true
+            }
+            // 去掉敏感信息
+            let arr = ['password'];
+            let result = JSON.parse(JSON.stringify(user))
+            arr.map(d => { delete result[d] })
+            result.isSign = isSign
+            // 返回数据
+            ctx.body = {
+                code: 200,
+                data: result,
+                message: 'SUCCESS!'
+            }
+        } else {
+            ctx.body = {
+                code: 500,
+                message: 'id不能为空!'
+            }
         }
-        // 去掉敏感信息
-        let arr = ['password'];
-        let result = JSON.parse(JSON.stringify(user))
-        arr.map(d => { delete result[d] })
-        result.isSign = isSign
-        // 返回数据
-        ctx.body = {
-            code: 200,
-            data: result,
-            message: 'SUCCESS!'
-        }
+
     }
     // 获取用户收藏的帖子列表
     async getCollectPosts(ctx) {
