@@ -22,6 +22,10 @@ router.get('/content/detail', ContentController.getPostDetail)
 // 获取评论列表
 router.get('/comments', CommentsController.getComments)
 
+// 滑块验证码
+router.post('/isVerify', PublicController.isVerify)
+router.post('/getSlidercaptchaXY', PublicController.getSlidercaptchaXY)
+router.post('/validSlidercaptcha', PublicController.validSlidercaptcha)
 
 
 module.exports = router
