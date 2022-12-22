@@ -24,7 +24,7 @@ async function send(sendInfo = {}) {
             //   pass: 'ahfygatujrtybfbi', // generated ethereal password
 
             user: '790143432@qq.com', // generated ethereal user
-            pass: 'lqjrkrhiidvabedd', // generated ethereal password
+            pass: 'seautbkmtnrabeej', // generated ethereal password
 
         },
     });
