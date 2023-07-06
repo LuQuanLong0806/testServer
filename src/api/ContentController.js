@@ -185,7 +185,6 @@ class ContentController {
         }
 
     }
-
     // 收藏帖子
     async collectPost(ctx) {
         // uid  tid
