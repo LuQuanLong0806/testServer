@@ -15,6 +15,7 @@ router.post('/add', ContentController.addPost)
 // 收藏
 router.post('/collect', ContentController.collectPost)
 
+router.get('/collect/posts', ContentController.getCollectPosts)
 
 
 module.exports = router

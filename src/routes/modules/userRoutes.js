@@ -21,5 +21,9 @@ router.post('/changePassword', UserController.changePassword)
 router.post('/info', UserController.userInfo)
 // 获取收藏帖子
 router.get('/collect/posts', UserController.getCollectPosts)
+// 获取用户列表
+router.get('/list', UserController.getUsers)
+
+
 
 module.exports = router

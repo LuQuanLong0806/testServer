@@ -255,6 +255,28 @@ class ContentController {
     async cancelCollect(ctx) {
 
     }
+    // 获取用户收藏的帖子列表
+    async getCollectPosts(ctx) {
+        let obj = getJWTPayload(ctx.header.authorization)
+        const body = ctx.request.query
+        if (obj._id && typeof obj._id != 'undefined') {
+            let page = body.page ? parseInt(body.page) : 1
+            let limit = body.limit ? parseInt(body.limit) : 10
+            const result = await Collection.getList({ uid: obj._id }, page, limit)
+            ctx.body = {
+                code: 200,
+                message: 'success!',
+                data: result
+            }
+        } else {
+            ctx.body = {
+                code: 401,
+                message: '请先登录!',
+                data: result
+            }
+        }
+
+    }
 
 }
 

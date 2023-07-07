@@ -318,6 +318,31 @@ class UserController {
                 data: result
             }
         }
+    }
+    // 获取用户列表接口
+    async getUsers(ctx) {
+        // 登录校验
+        const obj = await getJWTPayload(ctx.header.authorization);
+        if (true) {
+            // 获取get参数
+            const params = ctx.request.query
+            // 
+            let page = params.page ? parseInt(params.page) : 1
+            let limit = params.limit ? parseInt(params.limit) : 10
+            // 
+            const data = await User.getList({}, page, limit);
+            ctx.body = {
+                code: 200,
+                message: 'success',
+                data
+            }
+        } else {
+            ctx.body = {
+                code: 401,
+                message: '会话超时',
+                data
+            }
+        }
 
     }
 }

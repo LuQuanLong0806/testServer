@@ -55,6 +55,12 @@ UserSchema.statics = {
             username: 0,
             mobile: 0
         })
+    },
+    getList: function (options, sort, page, limit) {
+        return this.find(options)
+            .sort({ [sort]: -1 })
+            .skip(page * limit)
+            .limit(limit)
     }
 }
 
