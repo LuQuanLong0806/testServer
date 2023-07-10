@@ -25,5 +25,4 @@ router.get('/collect/posts', UserController.getCollectPosts)
 router.get('/list', UserController.getUsers)
 
 
-
 module.exports = router

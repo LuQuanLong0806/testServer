@@ -27,7 +27,7 @@ const router = require('./routes/routes')
 const app = new koa();
 
 // 定义公共路径 不需要 JWT 鉴权 , /^\/login/ , /\/login/
-const jwt = JWT({ secret: config.JWT_SECRET }).unless({ path: [/^\/public/, /\/login/] });
+const jwt = JWT({ secret: config.JWT_SECRET }).unless({ path: [/^\/public/, /\/login/]});
 // app.use(helmet())
 // app.use(statics(path.join(__dirname, './public'))) // 托管静态资源
 // app.use(koaBody())

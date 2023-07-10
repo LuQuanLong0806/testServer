@@ -1,5 +1,6 @@
 module.exports = (ctx, next) => {
     return next().catch((err) => {
+        console.log('errrrr', err);
         if (err.status === 401) {
             ctx.status = 401;
             ctx.body = {
