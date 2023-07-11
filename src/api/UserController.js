@@ -301,10 +301,10 @@ class UserController {
     // 获取用户收藏的帖子列表
     async getCollectPosts(ctx) {
         let obj = getJWTPayload(ctx.header.authorization)
-        const body = ctx.request.query
+        const params = ctx.request.query
         if (obj._id && typeof obj._id != 'undefined') {
-            let page = body.page ? parseInt(body.page) : 1
-            let limit = body.limit ? parseInt(body.limit) : 10
+            let page = params.page ? parseInt(params.page) : 1
+            let limit = params.limit ? parseInt(params.limit) : 10
             const result = await Collection.getList({ uid: obj._id }, page, limit)
             ctx.body = {
                 code: 200,
@@ -323,7 +323,7 @@ class UserController {
     async getUsers(ctx) {
         // 登录校验
         const obj = await getJWTPayload(ctx.header.authorization);
-        if (true) {
+        if (obj._id && typeof obj._id != 'undefined') {
             // 获取get参数
             const params = ctx.request.query
             // 
@@ -344,6 +344,93 @@ class UserController {
             }
         }
 
+    }
+    // 新增用户
+    async addUser(ctx) {
+        const obj = await getJWTPayload(ctx.header.authorization);
+        if (obj._id && typeof obj._id != 'undefined') {
+            const { body } = ctx.request;
+            let check = true, message = '';
+            // 校验 用户名或者昵称是否已存在
+            let user1 = await User.findOne({ name: body.name })
+            if (user1 && user1.name != 'undefined') {
+                check = false
+                message = '用户已存在'
+            }
+            let user2 = await User.findOne({ nickname: body.nickname })
+            if (user2 && user2.nickname != 'undefined') {
+                message = '昵称已存在'
+                check = false
+            }
+            if (!check) {
+                ctx.body = {
+                    code: 500,
+                    message
+                }
+            } else {
+                // 新增
+                body.password = await bcrypt.hash(body.password, 5)
+                const { name, nickname, gender, pic, regmark, status, mobile, location } = body
+                const user = new User({ name, nickname, gender, pic, regmark, status, mobile, location })
+                let result = await user.save()
+                ctx.body = {
+                    code: 200,
+                    message: 'success',
+                    data: result
+                }
+            }
+
+        } else {
+            ctx.body = {
+                code: 401,
+                message: '会话超时!'
+            }
+        }
+    }
+    // 修改用户信息
+    async editUserInfo(ctx) {
+        // 鉴权
+        const obj = await getJWTPayload(ctx.header.authorization);
+        if (obj._id && typeof obj._id != 'undefined') {
+            const { body } = ctx.request;
+            // const result = await User.findOneAndUpdate
+            const result = await User.findByID(body.id)
+            if (result) {
+                // 只要不是 空值 就全都更新 
+                const { name, nickname, gender, pic, regmark, status, mobile, location } = body;
+                // 根据id 修改用户信息
+                const res = await User.updateOne({ _id: body.id }, { $set: { nickname } });
+                if (res) {
+                    ctx.body = {
+                        code: 200,
+                        message: '修改成功!'
+                    }
+                } else {
+                    ctx.body = {
+                        code: 500,
+                        message: '数据库异常!'
+                    }
+                }
+            } else {
+                ctx.body = {
+                    code: 500,
+                    message: '用户不存在!'
+                }
+            }
+
+        } else {
+            ctx.body = {
+                code: 401,
+                message: '会话超时!'
+            }
+        }
+    }
+    // 删除用户
+    async deleteUser(ctx) {
+        const obj = await getJWTPayload(ctx.header.authorization);
+        if (obj._id && typeof obj._id != 'undefined') {
+
+        }
     }
 }
 

@@ -57,7 +57,10 @@ UserSchema.statics = {
         })
     },
     getList: function (options, sort, page, limit) {
-        return this.find(options)
+        return this.find(options, {
+            password: 0,
+        }
+        )
             .sort({ [sort]: -1 })
             .skip(page * limit)
             .limit(limit)
