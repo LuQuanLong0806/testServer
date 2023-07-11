@@ -42,7 +42,7 @@ class LoginController {
                     let token = jsonwebtoken.sign({ _id: user._id },
                         config.JWT_SECRET,
                         {
-                            expiresIn: '1d' // 1天后过期
+                            expiresIn: '30d' // 1天后过期
                         }
                     );
                     // 去掉用户的敏感信息
