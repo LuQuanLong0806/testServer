@@ -429,6 +429,26 @@ class UserController {
     async deleteUser(ctx) {
         const obj = await getJWTPayload(ctx.header.authorization);
         if (obj._id && typeof obj._id != 'undefined') {
+            const { body } = ctx.request
+            if (body.id || body.ids) {
+                let data = '';
+                if (body.ids) {
+                    data = await User.deleteMany({ _id: { $in: body.ids } })
+                } else {
+                    data = await User.deleteOne({ _id: body.id })
+                }
+                ctx.body = {
+                    code: 200,
+                    message: '删除成功',
+                    data
+                }
+
+            } else {
+                ctx.body = {
+                    code: 500,
+                    message: 'id不能为空'
+                }
+            }
 
         }
     }
